@@ -41,13 +41,13 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 
 | 属性 | 问题 | 替代方案 |
 |------|------|---------|
-| `letter-spacing` | 经常被过滤或覆盖 | 无法替代，接受微信默认值 |
+| `letter-spacing` | `<p>` 上可能被过滤；`<section>`/`<span>` 上通常生效 | 避免在 `<p>` 上使用；若需要，在 `<section>` 或 `<span>` 上设置 |
 | `line-height` | `<p>` 上几乎一定被覆盖 | 用 `<section>` 包裹，在 `<section>` 上设置 |
 | `margin` | `<p>` 的 margin 几乎一定被覆盖 | 用 `<section>` 包裹，在 `<section>` 上设置 |
 | `padding` | `<p>` 上可能被过滤 | 用 `<section>` 包裹 |
-| `text-indent` | 不稳定 | 不要用，用段间留白代替首行缩进 |
+| `text-indent` | `<p>` 上可能被覆盖；`<section>` 上大概率生效 | 优先用段间留白代替首行缩进；若必须用，在 `<section>` 上设置 |
 | `text-size-adjust` | 微信 WebView 内不一定生效 | 保留但不依赖它 |
-| `font-style: italic` | 中文字体下可能不生效 | 不要用斜体中文 |
+| `font-style: italic` | 中文字体无真正 italic 变体，会渲染为伪斜体（倾斜但不好看） | 不建议用斜体中文，效果差 |
 
 ### 核心结论
 
@@ -327,8 +327,8 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 - [ ] `<p>` 标签只用于纯文本行，不依赖其 margin/line-height
 - [ ] HTML 缩进：全文统一 2 空格，无 4 空格或更深缩进
 - [ ] 正文 15px，行高在 `<section>` 容器上设置
-- [ ] 不依赖 `letter-spacing`（可能被过滤）
-- [ ] 不依赖 `text-indent`（不稳定）
+- [ ] `letter-spacing` 仅在 `<section>`/`<span>` 上使用，不在 `<p>` 上使用
+- [ ] `text-indent` 仅在 `<section>` 上使用（或优先用段间留白代替）
 - [ ] 注释字号 ≥ 14px（微信最小值限制）
 - [ ] 连续纯文字 ≤3 段，中间有视觉断点
 - [ ] 章节标题用粗体+底线装饰
@@ -338,5 +338,5 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 - [ ] 无 `<ul>`/`<ol>`/`<li>` 标签
 - [ ] 强调色统一用 `#fa5151`
 - [ ] 正文颜色不超过 3 种（不含图片）
-- [ ] 无斜体中文、无下划线（超链接除外）
+- [ ] 无斜体中文（伪斜体效果差）、无下划线（超链接除外）
 - [ ] 深色模式兼容（无大面积背景色）
