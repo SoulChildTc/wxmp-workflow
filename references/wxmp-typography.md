@@ -89,7 +89,7 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 |------|------|------|------|------|
 | 大标题（h2 章节标题） | `<section>` | 1.2em（≈18px） | #3f3f3f | 粗体+底线区分 |
 | 小标题（h3 子标题） | `<section>` | 1.1em（≈16.5px） | #3f3f3f | 粗体 |
-| 正文 | `<section>` | 15px | #3f3f3f | 手机端阅读基准 |
+| 正文 | `<section>` | 15px | #3f3f3f | 手机端阅读基准，两端对齐 |
 | 引用块 | `<section>` | 15px | #666 | 灰色，左边框装饰 |
 | 注释/来源 | `<section>` | 14px | #999 | 不低于 14px |
 | 金句高亮 | `<section>` | 17px | #3f3f3f | 短句居中，长句左对齐 |
@@ -263,6 +263,72 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 </section>
 ```
 
+### 标题样式
+
+**大标题（h2 章节标题）— 粗体 + 红底线：**
+
+```html
+<section style="font-size: 1.2em; font-weight: bold; color: #3f3f3f; margin: 1.5em 0 0.75em; padding-bottom: 0.5em; border-bottom: 2px solid #fa5151;">
+  章节标题
+</section>
+```
+
+**小标题（h3 子标题）— 纯粗体，无底线：**
+
+```html
+<section style="font-size: 1.1em; font-weight: bold; color: #3f3f3f; margin: 1.25em 0 0.5em;">
+  子标题
+</section>
+```
+
+### Mac 代码块
+
+macOS 终端风格代码块，适合展示代码、命令、配置。
+
+```html
+<section style="margin: 1.25em 0; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
+  <section style="padding: 12px 16px; background: #2d2d2d;">
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; margin-right: 8px;"></span>
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; margin-right: 8px;"></span>
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></span>
+  </section>
+  <pre style="margin: 0; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.6; color: #e0e0e0; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;"><code>代码内容写在这里</code></pre>
+</section>
+```
+
+规则：
+- 深色背景在微信亮色/暗色模式下表现一致，无需特殊适配
+- 代码区用 `<pre>` 保留换行和空格，用 `<code>` 标记代码语义
+- `overflow-x: auto` 确保长代码行可横向滚动
+- 字号 14px（等宽字体在 14px 下可读性最佳）
+
+### 脚注引用
+
+微信不支持正文内可点击的外链，用上标编号 + 底部引用区替代。
+
+**正文内引用（上标编号）：**
+
+```html
+根据最新研究<sup style="font-size: 12px; color: #fa5151; padding: 0 2px;">[1]</sup>显示……
+```
+
+**底部引用区（文末、互动引导之前）：**
+
+```html
+<hr style="border: none; border-top: 1px solid #eee; margin: 1.5em 0 1.25em;" />
+<section style="margin: 0 0 1.25em; font-size: 14px; color: #999;">
+  <section style="font-weight: bold; color: #666; margin: 0 0 0.5em;">参考资料</section>
+  <section style="margin: 0 0 0.3em;">[1] 来源名称 — 纯文本 URL</section>
+  <section style="margin: 0 0 0.3em;">[2] 来源名称 — 纯文本 URL</section>
+</section>
+```
+
+规则：
+- 正文内只放上标编号 `<sup>[N]</sup>`，不放 URL
+- 底部引用区放在互动引导区之前
+- 每条引用写来源名称 + 纯文本 URL（不可点击，但读者可手动复制）
+- 如果引用少于 3 条且来源都是知名机构/网站，可以只写名称不写 URL
+
 ### 互动引导区
 
 ```html
@@ -314,6 +380,9 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 │  ...更多内容...                │
 │                              │
 │  ────────────────             │
+│  参考资料区（脚注, 14px #999）  │
+│                              │
+│  ────────────────             │
 │  互动引导区（居中, #999）       │
 │                              │
 └─────────────────────────┘
@@ -333,6 +402,10 @@ font-family: -apple-system-font, BlinkMacSystemFont, Helvetica Neue, PingFang SC
 - [ ] 连续纯文字 ≤3 段，中间有视觉断点
 - [ ] 章节标题用粗体+底线装饰
 - [ ] 段落首行不缩进，段间用 section margin 控制
+- [ ] 正文段落两端对齐（text-align: justify）
+- [ ] 章节标题用 h2 样式（粗体+底线），子标题用 h3 样式（纯粗体）
+- [ ] 代码块用 Mac 终端风格组件（深色背景+彩色圆点）
+- [ ] 外链用上标脚注引用，文末有「参考资料」区
 - [ ] 结尾有互动引导区
 - [ ] 图片宽度 100%，有圆角
 - [ ] 无 `<ul>`/`<ol>`/`<li>` 标签

@@ -90,7 +90,7 @@
 
 目的是让读者知道这不是 AI 编的。拿不到确切来源时，用模糊表述（"据了解"、"有消息显示"）比编一个假来源好。
 
-**外链限制：** 微信公众号正文不支持可点击的外链（个人订阅号完全不支持，已认证服务号需配白名单）。引用来源时只写名称不放 URL，如需放链接则放在文末纯文本或"阅读原文"位置。截图比链接更好——截官方页面/数据图直接插文中，既是证据又不受外链限制。
+**外链限制：** 微信公众号正文不支持可点击的外链（个人订阅号完全不支持，已认证服务号需配白名单）。处理方式：正文用上标编号引用（如 `<sup>[1]</sup>`），文末设「参考资料」区统一列出来源名称和纯文本 URL。截图比链接更好——截官方页面/数据图直接插文中，既是证据又不受外链限制。具体 HTML 模式见 `references/wxmp-typography.md` 组件库的「脚注引用」。
 
 **半自动：** 写完让用户审阅
 **全自动：** 写完直接进入打磨
@@ -245,13 +245,18 @@ bash scripts/wx-upload-image.sh /path/to/image.jpg
 > 详细规范见 `references/wxmp-typography.md`。以下为常用标签速查。
 
 ```html
-<!-- 标题 -->
+<!-- 大标题（h2 章节标题） -->
 <section style="font-size: 1.2em; font-weight: bold; color: #3f3f3f; margin: 1.5em 0 0.75em; padding-bottom: 0.5em; border-bottom: 2px solid #fa5151;">
-  小标题
+  章节标题
+</section>
+
+<!-- 小标题（h3 子标题） -->
+<section style="font-size: 1.1em; font-weight: bold; color: #3f3f3f; margin: 1.25em 0 0.5em;">
+  子标题
 </section>
 
 <!-- 段落（用 section 包裹，确保 margin/line-height 生效） -->
-<section style="font-size: 15px; color: #3f3f3f; line-height: 1.75; margin: 0 0 1.25em;">
+<section style="font-size: 15px; color: #3f3f3f; line-height: 1.75; margin: 0 0 1.25em; text-align: justify;">
   正文内容...
 </section>
 
@@ -282,6 +287,26 @@ bash scripts/wx-upload-image.sh /path/to/image.jpg
 
 <!-- 图片（必须是微信 CDN 地址） -->
 <img src="微信CDN地址" style="width: 100%; border-radius: 8px;" />
+
+<!-- Mac 代码块 -->
+<section style="margin: 1.25em 0; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
+  <section style="padding: 12px 16px; background: #2d2d2d;">
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; margin-right: 8px;"></span>
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; margin-right: 8px;"></span>
+  <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></span>
+  </section>
+  <pre style="margin: 0; padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.6; color: #e0e0e0; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;"><code>代码内容</code></pre>
+</section>
+
+<!-- 脚注引用（正文内） -->
+根据研究<sup style="font-size: 12px; color: #fa5151; padding: 0 2px;">[1]</sup>显示……
+
+<!-- 脚注引用（底部引用区，放在互动引导之前） -->
+<hr style="border: none; border-top: 1px solid #eee; margin: 1.5em 0 1.25em;" />
+<section style="margin: 0 0 1.25em; font-size: 14px; color: #999;">
+  <section style="font-weight: bold; color: #666; margin: 0 0 0.5em;">参考资料</section>
+  <section style="margin: 0 0 0.3em;">[1] 来源名称 — 纯文本 URL</section>
+</section>
 ```
 
 **列表标签限制：** 不要使用 `<ul>/<ol>/<li>`，公众号编辑器会特殊处理这些标签，可能导致空 bullet、样式剥离等兼容性问题。用上述模拟列表组件代替。

@@ -117,7 +117,7 @@ allowed-tools:
 
 ### 4. 写初稿
 
-按大纲撰写 Markdown 全文。口语化、适合手机阅读、1500-3000 字。遵循中文文案排版指北（`references/chinese-copywriting-guidelines.md`）的盘古之白、全角标点规范，以及排版设计规范（`references/wxmp-typography.md`）的字号、间距、视觉节奏、开头策略。英文术语按 `references/wxmp-writing.md` 的英文处理规则判断保留/翻译/音译。涉及数据/事件/他人观点时标注来源，正文不放外链（微信限制），截图比链接更好。
+按大纲撰写 Markdown 全文。口语化、适合手机阅读、1500-3000 字。遵循中文文案排版指北（`references/chinese-copywriting-guidelines.md`）的盘古之白、全角标点规范，以及排版设计规范（`references/wxmp-typography.md`）的字号、间距、视觉节奏、开头策略。英文术语按 `references/wxmp-writing.md` 的英文处理规则判断保留/翻译/音译。涉及数据/事件/他人观点时标注来源，外链用上标脚注引用、文末统一列出（微信不支持正文内可点击外链），截图比链接更好。
 
 **半自动：** 写完让用户审阅
 **全自动：** 写完直接进入打磨
