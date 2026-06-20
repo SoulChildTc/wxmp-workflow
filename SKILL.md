@@ -148,39 +148,34 @@ allowed-tools:
 
 在合适的位置添加图片，增强文章表现力。
 
-**前置步骤：先为这篇文章生成专属风格。** AI 读完全文后，基于文章类型和情感基调创造一套独一无二的视觉风格。一篇文章所有配图用同一套风格，保持视觉连贯。
+**风格生成：** 根据文章内容和情感基调决定风格。概念型配图（开头、结尾、隐喻、案例）走 `references/wxmp-style-generator.md` 的流程。证据截图、数据图表、步骤图直接写 prompt。
 
-> 风格生成流程见 `references/wxmp-style-generator.md`
-
-**适合加图的位置：** 开头配图（吸引注意力）、数据图表（可视化数据）、步骤截图（教程类）、结尾引导图（引导关注/转发）
+**适合加图的位置：** 开头配图、数据图表、步骤截图、结尾引导图
 
 **图片来源：** 用户自己提供 / AI 生成（Agnes 或 SenseNova）
 
-**图片内容限制：** 所有配图不能出现真人、不能包含任何文字（图像模型生成的中文都是乱码）、不能画图表/流程图。动画/插画/卡通人物不受限。AI 生成时 prompt 末尾加 `no real people, no human faces, no text, no labels, no chart, no diagram`
+**底线：** 图片中不能有文字、不能有真人、不能有图表/流程图。AI 生成时 prompt 末尾加 `no real people, no human faces, no text, no labels, no chart, no diagram`
 
-**AI 生成图片：** 构造 prompt 时按"风格描述 + 图片内容 + 约束"三段组合。图片中不能有任何文字（中文标注、标签、箭头文字都不要加），图像模型生成的中文全是乱码。优先 Agnes，Agnes 失败时切换 SenseNova：
+**AI 生成：** prompt 格式 = 视觉描述 + 场景 + 底线。优先 Agnes，失败切 SenseNova：
 ```bash
-# Agnes（通用图片）— prompt = 风格 + 场景内容 + 约束
 bash scripts/wx-generate-image.sh \
-  --prompt "Flat illustration on white background. Soft warm orange and cream color palette. Minimal geometric shapes. A small square character sits at a desk with a laptop, reaching toward floating shapes above. no real people, no human faces, no text, no labels, no chart, no diagram" \
+  --prompt "Warm orange and golden yellow tones, soft light from above. A ladder extends from bottom center up into soft clouds. no real people, no human faces, no text, no labels, no chart, no diagram" \
   --size 1024x768
-
-# SenseNova（信息图，Agnes 的备选方案）
 bash scripts/wx-generate-image-sensenova.sh \
-  --prompt "Flat illustration on white background. Soft warm orange and cream color palette. Minimal geometric shapes. A small square character sits at a desk with a laptop, reaching toward floating shapes above. no real people, no human faces, no text, no labels, no chart, no diagram" \
+  --prompt "Warm orange and golden yellow tones, soft light from above. A ladder extends from bottom center up into soft clouds. no real people, no human faces, no text, no labels, no chart, no diagram" \
   --size 2752x1536
 ```
 
-**图片必须先上传到微信素材库才能在文章中使用：**
+**上传：**
 ```bash
-bash scripts/wx-upload-image.sh /path/to/image.jpg          # 文章配图（默认 image 类型）
-bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图（thumb 类型）
+bash scripts/wx-upload-image.sh /path/to/image.jpg          # 正文配图
+bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图
 ```
 
-**半自动：** 生成风格后展示给用户确认 → 用户认可后生成配图
-**全自动：** 直接生成风格和配图，不确认
+**半自动：** 风格展示给用户确认 → 生成配图
+**全自动：** 直接生成
 
-> 详细指引见 `references/wxmp-images.md`
+> 详细规则见 `references/wxmp-images.md`
 
 ### 7. 排版
 
