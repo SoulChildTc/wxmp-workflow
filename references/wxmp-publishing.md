@@ -6,7 +6,7 @@
 - 发布步骤（获取 token、上传封面图、创建草稿）
 - 手动发布（无认证默认路径）
 - API 增强（已认证账号可用）
-- 复盘（复盘时机、复盘内容、查询数据、输出格式）
+- 复盘（触发词、执行流程、查询命令、分析内容、输出格式）
 - 错误处理策略
 - 注意事项
 
@@ -163,35 +163,25 @@ bash scripts/wx-publish.sh --media-id DRAFT_MEDIA_ID
 
 ## 复盘
 
-发布后分析数据表现，总结经验教训，为下次选题提供参考。
+用户回来说"帮我查数据"时，通过 API 拉数据做分析。发布时不记录任何文件。
 
-### 复盘时机
+### 触发词
 
-- 发布后 24 小时：查看初步阅读数据
-- 发布后 3 天：查看传播数据（分享、收藏）
-- 发布后 7 天：查看完整数据，做总结
+用户说以下任意一句即启动复盘流程：`帮我查数据`、`帮我看看那篇文章的数据`、`复盘`、`看看数据`。
 
-### 复盘内容
+### 执行流程
 
-1. **数据表现**
-   - 阅读量：多少人看了？
-   - 分享率：多少人转发了？（分享数/阅读数）
-   - 收藏率：多少人收藏了？（收藏数/阅读数）
-   - 互动：有多少评论/点赞？
+1. **拉文章列表**：`bash scripts/wx-articles.sh`，展示给用户选择
+2. **用户选文章**：确认要复盘哪篇
+3. **检查数据是否可用**：发布时间是否已过 1 天
+   - 还没到：告知用户"数据有 ~1 天延迟，明天再来查"
+   - 已过 1 天：继续下一步
+4. **查数据**：`bash scripts/wx-article-stats.sh --recent N`
+   - N 的范围：发布到现在的天数，最多 7 天
+   - 如果超过 7 天，优先查前 7 天（近期数据最有参考价值）
+5. **输出复盘分析**
 
-2. **标题效果**
-   - 标题是否带来了足够的点击？
-   - 和历史文章对比如何？
-
-3. **选题复盘**
-   - 这个选题方向是否值得继续？
-   - 读者反馈中有什么新线索？
-
-4. **经验总结**
-   - 这次做得好的地方是什么？
-   - 下次可以改进什么？
-
-### 查询数据
+### 查询命令参考
 
 ```bash
 # 查看已发布文章列表
@@ -201,35 +191,80 @@ bash scripts/wx-articles.sh --count 20 --offset 20   # 获取第21-40篇（用 -
 # 查看单篇文章详细数据
 bash scripts/wx-article-stats.sh --date 2026-06-05   # 指定某天
 bash scripts/wx-article-stats.sh --recent 7          # 最近7天
-
-# 查看每日汇总数据
-bash scripts/wx-stats.sh --date 2026-06-05           # 指定某天
-bash scripts/wx-stats.sh --recent 7                  # 最近7天
 ```
 
-统计数据有约 1 天延迟，且最多查询 7 天范围。API 每次最多返回 1 天数据，脚本自动循环拼接多天数据。
+统计数据有约 1 天延迟，且最多查询 7 天范围。API 数据按日期查询，脚本自动拼接。
+
+### 复盘分析内容
+
+查看数据后，按以下维度输出分析：
+
+1. **数据表现**
+   - 阅读量（人数 + 次数）
+   - 分享率 = 分享人数 / 阅读人数
+   - 收藏率 = 收藏人数 / 阅读人数
+   - 和历史文章对比（如果 API 能查到历史数据）
+
+2. **标题效果**
+   - 这篇的阅读量是否正常？
+   - 分享率是否高于平均水平？
+
+3. **选题建议**
+   - 这个方向值得继续写吗？
+   - 根据数据给出下篇选题建议
 
 ### 复盘输出格式
 
-```
-📊 复盘报告
+输出为内联 HTML，风格参考排版设计规范（配色 #3f3f3f/#fa5151/#f7f7f7、圆角 8px、留白）。数据用卡片呈现，让数字一目了然。
 
-文章：《xxx》
-发布时间：xxxx-xx-xx
+**设计规则：**
+- 每个关键指标（阅读、分享率、收藏率）独立一张卡片，`flex` 并排
+- 数字用大字（24px）+ 品牌色（#fa5151），标签用小字（12px）+ 灰色（#999）
+- 表现好的指标（分享率 > 10%）用绿色（#07c160）标记，一般的用默认色
+- 分析区用左边框卡片（参照排版规范的信息提示框组件）
+- 建议区单独一行
 
-数据表现：
-- 阅读量：xxx
-- 分享人数：xxx（分享率：xx%）
-- 收藏人数：xxx（收藏率：xx%）
-- 评论数：xxx
+示例结构（实际输出时填充真实数据，样式可微调以适配不同数据量）：
 
-分析：
-- 标题效果：xxx
-- 选题方向：xxx
-- 做得好的：xxx
-- 下次改进：xxx
+```html
+<section style="margin: 0 0 1.25em; font-family: -apple-system-font, Helvetica Neue, PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif;">
 
-💡 建议下次选题方向：xxx
+  <section style="font-size: 18px; font-weight: bold; color: #3f3f3f; margin: 0 0 0.25em;">
+  📊 复盘报告
+  </section>
+  <section style="font-size: 13px; color: #999; margin: 0 0 1.25em;">
+  《文章标题》· xxxx-xx-xx 发布
+  </section>
+
+  <!-- 数据卡片行 -->
+  <section style="display: flex; gap: 10px; margin: 0 0 1.25em;">
+    <section style="flex: 1; padding: 14px 8px; background: #f7f7f7; border-radius: 8px; text-align: center;">
+      <section style="font-size: 26px; font-weight: bold; color: #fa5151; line-height: 1.3;">xxx</section>
+      <section style="font-size: 12px; color: #999; line-height: 1.4;">阅读人数</section>
+    </section>
+    <section style="flex: 1; padding: 14px 8px; background: #f7f7f7; border-radius: 8px; text-align: center;">
+      <section style="font-size: 26px; font-weight: bold; color: #07c160; line-height: 1.3;">xx%</section>
+      <section style="font-size: 12px; color: #999; line-height: 1.4;">分享率</section>
+    </section>
+    <section style="flex: 1; padding: 14px 8px; background: #f7f7f7; border-radius: 8px; text-align: center;">
+      <section style="font-size: 26px; font-weight: bold; color: #3f3f3f; line-height: 1.3;">xx%</section>
+      <section style="font-size: 12px; color: #999; line-height: 1.4;">收藏率</section>
+    </section>
+  </section>
+
+  <!-- 分析卡片 -->
+  <section style="margin: 0 0 0.75em; padding: 0.75em 1em; border-left: 3px solid #fa5151; background: #f7f7f7; border-radius: 0 6px 6px 0;">
+    <section style="font-size: 14px; color: #3f3f3f; line-height: 1.7;">
+    <strong>标题效果：</strong>xxx<br/>
+    <strong>选题评估：</strong>xxx
+    </section>
+  </section>
+
+  <!-- 建议 -->
+  <section style="font-size: 14px; color: #666; line-height: 1.6; padding: 0.5em 0;">
+  💡 <strong>建议：</strong>xxx
+  </section>
+</section>
 ```
 
 ## 错误处理策略
