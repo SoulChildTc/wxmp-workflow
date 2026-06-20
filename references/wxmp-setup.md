@@ -7,8 +7,7 @@
 - 1. 微信公众号 API
 - 2. 写作质量工具（Humanizer + StopSlop 合并）
 - 3. 图片生成（Agnes + SenseNova 合并）
-- 4. Wechatsync（多平台同步）
-- 5. Reddit 信源（选题扩展）
+- 4. Reddit 信源（选题扩展）
 - 快速检查清单
 - 配置文件模板
 
@@ -33,10 +32,10 @@
 | 功能 | 状态 | 说明 |
 |------|------|------|
 | 公众号 API | ✅ 已配置 / ❌ 未配置 | AppID + Secret，发布必需 |
+| 个人认证 | ✅ 已认证 / ❌ 未认证 | 影响能否 API 发布 |
 | Humanizer | ✅ 已安装 / ❌ 未安装 | 去 AI 痕迹，可选 |
 | StopSlop | ✅ 已安装 / ❌ 未安装 | 写作质量打磨，可选 |
 | Agnes AI | ✅ 已配置 / ❌ 未配置 | 图片生成，可选 |
-| Wechatsync | ✅ 已配置 / ❌ 未配置 | 多平台同步，可选 |
 | Reddit 信源 | ✅ 已配置 / ❌ 未配置 | 选题扩展，可选 |
 ```
 
@@ -66,6 +65,7 @@
 - `author`："文章作者名是什么？创建草稿时会自动填入。"
 - `default_comment`："默认开启评论吗？（1=开，0=关）"
 - `default_fans_only_comment`："默认仅粉丝可评论吗？（1=是，0=否）"
+- `verified`："公众号是否完成了个人认证？这决定发布走 API 自动发布还是引导去后台手动发布。大多数个人订阅号没有认证。"
 
 ### 第 4 步：询问代理地址
 
@@ -118,7 +118,6 @@
 - StopSlop："要安装 StopSlop 来提升文章质量吗？它是一套专业的写作打磨规则，配合 Humanizer 效果更好。"
 - Agnes AI："要配置 AI 图片生成吗？可以一句话生成配图。"
 - SenseNova："Agnes 不稳定的话，要同时配置 SenseNova 作为备选图片生成方案吗？擅长信息图。"
-- Wechatsync："要配置多平台同步吗？可以把文章一键同步到知乎、掘金等 24 平台。"
 - Reddit："要接入 Reddit 作为选题信源吗？信息差大、时效性强。需要在浏览器登录 Reddit。"
 
 用户说"要"→ 引导配置；说"不要"→ 跳过，不打扰；说"已经装过了"→ 跳过安装，验证可用即可。
@@ -149,7 +148,6 @@
 | 发布到公众号 | 推荐 | AppID + Secret |
 | 去 AI 痕迹 + 打磨质量 | 可选 | Humanizer / StopSlop skill |
 | 图片生成 | 可选 | Agnes / SenseNova API Key |
-| 多平台同步 | 可选 | Wechatsync CLI + Chrome 扩展 |
 | Reddit 选题 | 可选 | rdt-cli + Chrome 登录 |
 
 > 💡 选题时的信源连通性由 AI 自动探测并缓存到 `config/connectivity.json`，无需手动配置。
@@ -160,7 +158,7 @@
 
 用于自动创建草稿、发布文章、查询数据统计。
 
-> ⚠️ 发布需公众号完成**个人认证**，否则报 `48001 api unauthorized`。未认证时只能创建草稿。
+> ⚠️ 发布需公众号完成**个人认证**，否则报 `48001 api unauthorized`。未认证时只能创建草稿，发布需去后台手动操作。大多数个人订阅号没有认证，这是正常情况。
 
 **获取：** 微信公众平台 → 我的业务与服务 → 公众号 → 开发密钥
 
@@ -209,30 +207,7 @@
 
 ---
 
-## 4. Wechatsync（多平台同步，可选）
-
-把文章同步到知乎、掘金、CSDN 等 24 平台草稿箱。
-
-**配置步骤：**
-1. 安装 CLI：`npm install -g @wechatsync/cli`
-2. Chrome 安装[文章同步助手扩展](https://chrome.google.com/webstore/detail/hchobocdmclopcbnibdnoafilagadion)
-3. 在浏览器里登录目标平台
-4. 在扩展设置中启用「MCP 连接」，记下 Token
-
-**配置同步平台：** 首次同步时告诉 AI 目标平台，自动写入 `config/wxmp.json` 的 `wechatsync_platforms`。后续说"加一个 XXX 平台"即可更新。
-
-**验证：** `export WECHATSYNC_TOKEN="你的token" && wechatsync platforms --auth`
-
-**常见问题：**
-- CLI 连不上扩展 → 确认扩展已装且「MCP 连接」已开启
-- 平台未登录 → 在浏览器里手动登录
-- Token 不一致 → CLI 的 Token 和扩展里的要一致
-
-没配时：文章只发公众号，同步需手动复制粘贴。
-
----
-
-## 5. Reddit 信源（选题扩展，可选）
+## 4. Reddit 信源（选题扩展，可选）
 
 AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 
@@ -257,11 +232,11 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 {
   "appid": "wx1234567890abcdef",
   "secret": "your_app_secret_here",
+  "verified": false,
   "author": "你的公众号名称",
   "default_comment": 1,
   "default_fans_only_comment": 0,
   "agnes_api_key": "your_agnes_api_key_here",
-  "wechatsync_platforms": ["zhihu", "juejin", "csdn"],
   "proxy": {
     "http": "",
     "https": ""
@@ -278,10 +253,10 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 |------|------|--------|
 | `appid` | 公众号 AppID | 发布必需 |
 | `secret` | 公众号 AppSecret | 发布必需 |
+| `verified` | 是否完成个人认证（false=手动发布，true=可用 API 发布） | false |
 | `author` | 文章作者名，创建草稿时自动填入 | 空 |
 | `default_comment` | 是否开启评论（1=开，0=关） | 1 |
 | `default_fans_only_comment` | 是否仅粉丝可评论（1=是，0=否） | 0 |
 | `proxy` | 代理配置，含 `http` 和 `https` 两个字段，空则不走代理 | `{"http":"","https":""}` |
 | `agnes_api_key` | Agnes AI 图片生成 API Key | 可选 |
-| `wechatsync_platforms` | 多平台同步目标列表 | 可选 |
 | `topic_sources` | 选题信源，对象结构：`tech`（科技）、`finance`（财经）、`custom`（自定义），每个字段是字符串数组。`custom` 用于 Reddit 等扩展信源 | 见示例 |

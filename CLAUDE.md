@@ -17,7 +17,7 @@ This is **not** a traditional codebase with build/test commands. It's a skill de
 - The 10-step workflow overview with pointers to reference docs
 - De-AI-flavor checking (4-round scan: feature words, structure, style, human touch)
 
-**references/** contains detailed instructions for each workflow phase. SKILL.md points here when the agent needs specifics. Files use `wxmp-` prefix to avoid naming conflicts. The topic discovery phase (`wxmp-inspiration.md`) uses three discovery modes: 热点速报 (daily news + hot search), 深度选题 (original sources like GitHub/HN for information gaps), 预判选题 (calendar events). A connectivity cache (`config/connectivity.json`) auto-detects the best access method for each source (direct/proxy/websearch). Reddit is an optional source via `rdt-cli`. Writing follows Chinese copywriting guidelines (`references/chinese-copywriting-guidelines.md`) for typography (pangu spacing, full-width punctuation, etc.) and a mobile-first layout spec (`references/wxmp-typography.md`) for font sizes, spacing, colors, visual rhythm, opening strategies, and component patterns. The polishing phase (`wxmp-writing.md`) includes a mandatory de-AI-flavor step — uses [Humanizer](https://github.com/blader/humanizer) + [StopSlop](https://github.com/hardikpandya/stop-slop) if installed, otherwise falls back to built-in 4-round scan (feature words, structure, style, human touch) in `wxmp-tools.md`. The setup guide (`wxmp-setup.md`) walks users through configuring WeChat API, StopSlop, Agnes AI, Wechatsync, and optional Reddit.
+**references/** contains detailed instructions for each workflow phase. SKILL.md points here when the agent needs specifics. Files use `wxmp-` prefix to avoid naming conflicts. The topic discovery phase (`wxmp-inspiration.md`) uses three discovery modes: 热点速报 (daily news + hot search), 深度选题 (original sources like GitHub/HN for information gaps), 预判选题 (calendar events). A connectivity cache (`config/connectivity.json`) auto-detects the best access method for each source (direct/proxy/websearch). Reddit is an optional source via `rdt-cli`. Writing follows Chinese copywriting guidelines (`references/chinese-copywriting-guidelines.md`) for typography (pangu spacing, full-width punctuation, etc.) and a mobile-first layout spec (`references/wxmp-typography.md`) for font sizes, spacing, colors, visual rhythm, opening strategies, and component patterns. The polishing phase (`wxmp-writing.md`) includes a mandatory de-AI-flavor step — uses [Humanizer](https://github.com/blader/humanizer) + [StopSlop](https://github.com/hardikpandya/stop-slop) if installed, otherwise falls back to built-in 4-round scan (feature words, structure, style, human touch) in `wxmp-tools.md`. The setup guide (`wxmp-setup.md`) walks users through configuring WeChat API, StopSlop, Agnes AI, and optional Reddit.
 
 **scripts/** are shell scripts (curl + jq) for API interaction. All read config from `config/wxmp.json`. Key scripts:
 - `wx-auth.sh` — token management with 2-hour cache in `/tmp/wxmp-token.json`
@@ -30,7 +30,6 @@ This is **not** a traditional codebase with build/test commands. It's a skill de
 - `wx-article-stats.sh` — per-article detailed stats (7-day max range)
 - `wx-generate-image.sh` — Agnes AI image generation (文生图)
 - `wx-generate-image-sensenova.sh` — SenseNova U1 Fast image generation (信息图, Agnes fallback)
-- Multi-platform sync uses Wechatsync CLI (`wechatsync sync`) — requires Chrome extension + browser login sessions
 
 **templates/** contains 5 beautiful HTML templates with inline styles:
 - `minimal-white.html` — clean, lots of whitespace (tutorials, guides)
@@ -51,7 +50,6 @@ Templates are designed for WeChat dark/light mode compatibility: no background c
 - Daily publish limits: subscription accounts (订阅号) 1/day, service accounts (服务号) 4/day
 - Stats APIs have time span limits: `getarticlesummary` max 1 day, `getarticletotal` max 7 days
 - Stats data has ~1 day delay (can't query today's data until tomorrow)
-- Multi-platform sync requires Wechatsync CLI + Chrome extension + user logged into target platforms in browser; sync creates drafts only, user publishes manually
 
 ## Configuration
 
@@ -71,7 +69,6 @@ The config file contains secrets and is gitignored. Key fields:
 - `agnes_api_key` — Agnes AI API key for image generation (optional)
 - `proxy` — proxy config object with `http` and `https` fields (e.g. `{"http":"http://127.0.0.1:7890","https":"http://127.0.0.1:7890"}`); empty strings mean no proxy (optional)
 - `topic_sources` — user-configured original sources for deep topic discovery (optional, has defaults)
-- `wechatsync_platforms` — multi-platform sync target list (optional)
 
 ## Modifying the Skill
 

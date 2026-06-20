@@ -1,12 +1,12 @@
 {
   "appid": "YOUR_APPID_HERE",
   "secret": "YOUR_SECRET_HERE",
+  "verified": false,
   "author": "你的公众号名称",
   "default_comment": 1,
   "default_fans_only_comment": 0,
   "agnes_api_key": "YOUR_AGNES_API_KEY_HERE",
   "sensenova_api_key": "YOUR_SENSENOVA_API_KEY_HERE",
-  "wechatsync_platforms": [],
   "proxy": {
     "http": "",
     "https": ""

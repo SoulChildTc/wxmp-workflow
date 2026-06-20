@@ -5,7 +5,7 @@
 一个 AI Agent skill，帮你完成公众号内容创作的全链路。兼容 Claude Code、Cursor、Windsurf 等支持 skill 的 Agent 工具：
 
 ```
-选题 → 大纲 → 调研 → 写稿 → 打磨 → 配图 → 排版 → 发布 → 复盘 → 多平台同步
+选题 → 大纲 → 调研 → 写稿 → 打磨 → 配图 → 排版 → 发布 → 复盘
 ```
 
 支持**全自动**（无人值守）和**半自动**（交互式确认）两种模式。
@@ -24,7 +24,6 @@
 | 📐 排版 | 5 个精美 HTML 模板，适配微信深色/浅色模式 |
 | 🚀 发布 | API 自动发布、数据统计查询 |
 | 📊 复盘 | 阅读量/分享率分析、经验总结 |
-| 🔄 同步 | 一键同步到知乎、掘金、CSDN 等 24 平台草稿箱 |
 
 ---
 
@@ -61,7 +60,6 @@ npx skills update wxmp-workflow
 | 全自动帮我写完直接发 | 无人值守模式 |
 | 帮我想几个标题 | 单独调用爆款标题生成器 |
 | 帮我看看文章怎么样 | 调用文章体检报告 |
-| 同步到其他平台 | 发布后同步到知乎/掘金等平台 |
 
 ---
 
@@ -80,7 +78,6 @@ cp config/wxmp.example.json config/wxmp.json
 | 去 AI 痕迹 | 可选 | Humanizer skill |
 | 写作质量打磨 | 可选 | StopSlop skill |
 | AI 生成配图 | 可选 | `agnes_api_key` |
-| 多平台同步 | 可选 | Wechatsync CLI + Chrome 扩展 |
 | Reddit 选题信源 | 可选 | rdt-cli + Chrome 登录 Reddit |
 
 获取公众号 API：微信公众平台 → 我的业务与服务 → 公众号 → 开发密钥
@@ -139,7 +136,6 @@ wxmp-workflow/
 │   ├── wxmp-writing.md         # 撰写 + 打磨 + 配图 + 排版
 │   ├── wxmp-tools.md           # 增强工具集
 │   ├── wxmp-publishing.md      # 发布 + 复盘
-│   ├── wxmp-sync.md            # 多平台同步
 │   └── wxmp-setup.md           # 配置助手
 ├── scripts/                    # API 脚本（curl + jq）
 ├── templates/                  # 5 个精美 HTML 模板
@@ -165,9 +161,6 @@ bash scripts/wx-article-stats.sh --recent 7
 
 # AI 图片生成
 bash scripts/wx-generate-image.sh --prompt "图片描述"
-
-# 多平台同步
-wechatsync sync output/xxx.html -p zhihu,juejin,csdn
 ```
 
 ---

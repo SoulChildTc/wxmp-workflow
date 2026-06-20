@@ -3,9 +3,9 @@ name: wxmp-workflow
 preamble-tier: 4
 version: 1.0.0
 description: |
-  微信公众号全流程工作流 — 从发现灵感、撰写文章到直接发布。
-  覆盖选题策划、竞品分析、文章撰写、HTML 排版、API 发布、数据统计全链路。
-  支持全自动（无人值守）和半自动（交互式）两种模式。
+  微信公众号全流程工作流 — 从发现灵感、撰写文章到创建草稿。
+  覆盖选题策划、竞品分析、文章撰写、HTML 排版、API 创建草稿、数据统计全链路。
+  个人订阅号无认证时发布会引导用户去后台手动操作。
   Use when: "公众号", "写文章", "发文", "选题", "涨粉", "内容运营", "草稿箱",
   "帮我写篇公众号", "最近公众号没什么灵感", "公众号文章", "发布到公众号".
   Proactively suggest when the user mentions writing articles, content creation,
@@ -29,7 +29,7 @@ allowed-tools:
 
 # 微信公众号工作流
 
-一站式完成公众号内容创作：**选题（三模式扫描）→ 大纲 → 调研 → 写稿 → 打磨 → 配图 → 排版 → 发布 → 复盘 → 多平台同步**。
+一站式完成公众号内容创作：**选题（三模式扫描）→ 大纲 → 调研 → 写稿 → 打磨 → 配图 → 排版 → 发布 → 复盘**。
 
 ## 核心约束
 
@@ -44,9 +44,9 @@ allowed-tools:
 
 **半自动卡点：** 选题确认、大纲确认、初稿审阅、配图确认、体检报告、标题选择、发布确认
 
-**全自动策略：** 优先选信息差最大 + 受众匹配度最高的选题、按大纲直接写、根据体检报告自动优化、优先选爆款潜力最高的标题（口语法 > 好奇法 > 痛点法 > 数字法 > 对比法 > 权威法）、标题与内容对齐、打磨完成后跳过预览直接发布。注意：草稿在排版阶段创建，打磨/配图可能修改 HTML，发布前用 `--media-id` 更新草稿确保内容是最新的。
+**全自动策略：** 优先选信息差最大 + 受众匹配度最高的选题、按大纲直接写、根据体检报告自动优化、优先选爆款潜力最高的标题（口语法 > 好奇法 > 痛点法 > 数字法 > 对比法 > 权威法）、标题与内容对齐、打磨完成后跳过预览。草稿在排版阶段创建，打磨/配图可能修改 HTML，发布前用 `--media-id` 更新草稿确保内容是最新的。注意：全自动只能创建草稿，发布仍需用户去公众号后台手动操作（个人订阅号无 API 发布权限）。
 
-**全自动失败处理：** 某个步骤失败时不中断全流程——跳过失败步骤继续，最后汇总报告哪些步骤成功、哪些失败。常见情况：API 发布失败 → 保留草稿，提示手动发布；图片生成失败 → 跳过配图继续排版；信源访问失败 → 用其他信源的结果。
+**全自动失败处理：** 某个步骤失败时不中断全流程——跳过失败步骤继续，最后汇总报告哪些步骤成功、哪些失败。常见情况：图片生成失败 → 跳过配图继续排版；信源访问失败 → 用其他信源的结果。
 
 **步骤状态标记：** 每完成一个步骤，MUST 输出状态标记，格式为 `✅ 步骤 N：步骤名 — 一句话说明结果`。示例：
 ```
@@ -71,7 +71,6 @@ allowed-tools:
 | "帮我写个摘要" | 调用摘要生成器 |
 | "帮我看看文章怎么样" / "有没有改进空间" | 调用文章体检报告 |
 | "帮我加几个标签" | 调用话题标签推荐 |
-| "同步到其他平台" / "发到知乎" / "发到掘金" | 执行多平台同步（见第 10 步） |
 | "帮我配置" / "怎么设置" / "配置助手" / "检查配置" | 运行配置助手（见 `references/wxmp-setup.md`） |
 
 如果不确定用户意图，直接问。
@@ -195,35 +194,52 @@ bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图（thumb
 
 ### 8. 发布
 
-通过 shell 脚本自动化发布，或引导用户手动发布。
+> ⚠️ 个人订阅号通常没有个人认证，预览和发布 API 不可用。但**创建草稿和查询数据不需要认证**。
 
-> ⚠️ 发布 API 需要公众号完成个人认证。未认证时创建草稿正常，但发布会报 `48001 api unauthorized`，需引导用户手动去公众号后台发布。
+读取 `config/wxmp.json` 的 `verified` 字段确定走哪条路。如果字段不存在，按 `false` 处理。
+
+**默认路径（`verified: false`）：用 API 创建草稿，引导手动发布**
 
 ```bash
-bash scripts/wx-auth.sh                                          # 获取 token
-bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb         # 上传封面图（注意 thumb 类型）
+# 1. 获取 token（自动缓存 2 小时）
+bash scripts/wx-auth.sh
 
-# 第一次创建草稿（记住返回的 media_id）
-bash scripts/wx-draft.sh --title "标题" --content output/xxx.html --thumb MEDIA_ID
-# 可选参数: --author "作者" --digest "摘要" --comment 1 --fans-only 0
+# 2. 上传封面图（注意 thumb 类型）
+bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb
 
-# 后续修改同一篇文章（复用 media_id）
-bash scripts/wx-draft.sh --media-id DRAFT_MEDIA_ID --title "新标题" --content output/xxx.html --thumb MEDIA_ID
+# 3. 创建草稿（记住返回的 media_id）
+bash scripts/wx-draft.sh --title "标题" --content output/xxx.html --thumb MEDIA_ID \
+  --author "作者" --digest "摘要" --comment 1
 
-# 预览（半自动模式，发到用户微信号；无权限时引导手动预览）
+# 4. 如果后续修改了内容，更新草稿（复用 media_id）
+bash scripts/wx-draft.sh --media-id DRAFT_MEDIA_ID --title "新标题" \
+  --content output/xxx.html --thumb MEDIA_ID
+```
+
+草稿创建成功后，引导用户去公众号后台完成剩下的操作：
+1. 内容管理 → 草稿箱 → 找到草稿
+2. 在手机上预览效果
+3. 确认无误后点击发布
+
+**已认证账号（`verified: true`）：可用 API 预览和发布**
+
+```bash
+# 预览（发到用户微信号）
 bash scripts/wx-preview.sh --media-id DRAFT_MEDIA_ID --wx-name 微信号
 
-# 发布
-bash scripts/wx-publish.sh --media-id DRAFT_MEDIA_ID            # 可选: --wait true --timeout 120
+# 发布（异步操作，脚本自动轮询状态）
+bash scripts/wx-publish.sh --media-id DRAFT_MEDIA_ID
+```
 
-# 查数据（stats API 每次最多查 1 天，脚本自动循环拼接；数据有 ~1 天延迟）
-bash scripts/wx-stats.sh --recent 1          # 最近 1 天摘要
-bash scripts/wx-articles.sh --count 20       # 最近 20 篇（单次上限，用 --offset 翻页）
+**查数据（无需认证）：**
+```bash
+bash scripts/wx-stats.sh --recent 7          # 最近 7 天每日汇总
+bash scripts/wx-articles.sh --count 20       # 最近 20 篇，用 --offset 翻页
 bash scripts/wx-article-stats.sh --recent 7  # 最近 7 天单篇详情
 ```
 
-**半自动：** 预览 → 用户确认 → 发布
-**全自动：** 直接发布
+**半自动：** 创建草稿 → 引导用户去后台预览 → 用户确认后（手动）发布
+**全自动：** 自动创建草稿，告知用户"草稿已就绪，去公众号后台手动发布"
 
 > 详细流程见 `references/wxmp-publishing.md`
 
@@ -237,25 +253,6 @@ bash scripts/wx-article-stats.sh --recent 7  # 最近 7 天单篇详情
 **全自动：** 自动查询数据，生成复盘报告
 
 > 详细指引见 `references/wxmp-publishing.md` 的复盘章节
-
-### 10. 多平台同步（可选）
-
-公众号发布并确认效果后，可将文章同步到其他内容平台（知乎、掘金、CSDN 等）的草稿箱。
-
-**前置条件：**
-- `npm install -g @wechatsync/cli`
-- Chrome 安装 [Wechatsync 扩展](https://chrome.google.com/webstore/detail/hchobocdmclopcbnibdnoafilagadion)
-- 在浏览器里登录各平台账号
-
-**首次同步：** 询问用户要同步到哪些平台，写入 `config/wxmp.json` 的 `wechatsync_platforms` 字段
-**后续同步：** 读取配置，直接同步
-**添加平台：** 用户说"加一个 XXX 平台"，更新配置文件即可
-
-```bash
-wechatsync sync output/xxx.html -p zhihu,juejin,csdn
-```
-
-文章进入各平台草稿箱，用户自行预览和发布。详细指引见 `references/wxmp-sync.md`
 
 ## 增强工具
 
@@ -288,4 +285,4 @@ cp config/wxmp.example.json config/wxmp.json
 
 配置文件包含敏感信息，已在 `.gitignore` 中排除。
 
-用户说"帮我配置"或"配置助手"时，先检查 `config/wxmp.json` 中哪些已配置、哪些缺失，只引导用户配置缺失的部分。可选功能（Humanizer、StopSlop、Agnes AI、Wechatsync、Reddit）逐个询问是否需要，用户说不要就跳过。
+用户说"帮我配置"或"配置助手"时，先检查 `config/wxmp.json` 中哪些已配置、哪些缺失，只引导用户配置缺失的部分。可选功能（Humanizer、StopSlop、Agnes AI、Reddit）逐个询问是否需要，用户说不要就跳过。
