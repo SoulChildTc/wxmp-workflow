@@ -1,5 +1,17 @@
 # 配置助手
 
+## Contents
+
+- 执行流程（7 步：检查→选择位置→基础配置→代理→信源→可选功能→确认）
+- 配置总览（功能速查表）
+- 1. 微信公众号 API
+- 2. 写作质量工具（Humanizer + StopSlop 合并）
+- 3. 图片生成（Agnes + SenseNova 合并）
+- 4. Wechatsync（多平台同步）
+- 5. Reddit 信源（选题扩展）
+- 快速检查清单
+- 配置文件模板
+
 首次使用或需要配置新功能时，引导用户完成前置准备。按需配置，不是所有功能都需要。
 
 ## 执行流程
@@ -129,276 +141,109 @@
 
 ## 配置总览
 
-> 💡 以下功能章节按配置依赖排序，与上方执行流程的步骤编号不对应。
+> 以下功能按配置依赖排序。不配置不影响核心写作功能，只会缺少对应能力。
 
-| 功能 | 是否必须 | 需要什么 |
-|------|---------|---------|
-| 写文章、打磨、排版 | ✅ 必须 | 无，开箱即用 |
-| 发布到公众号 | 推荐 | 微信公众号 AppID + Secret |
-| 去 AI 痕迹 | 可选 | Humanizer skill |
-| 写作质量打磨 | 可选 | StopSlop skill |
-| AI 生成配图 | 可选 | Agnes AI API Key 和/或 SenseNova API Key |
-| 同步到其他平台 | 可选 | Wechatsync CLI + Chrome 扩展 |
-| Reddit 选题信源 | 可选 | rdt-cli + Chrome 登录 Reddit |
+| 功能 | 必须 | 需要什么 |
+|------|------|---------|
+| 写文章、打磨、排版 | ✅ | 无，开箱即用 |
+| 发布到公众号 | 推荐 | AppID + Secret |
+| 去 AI 痕迹 + 打磨质量 | 可选 | Humanizer / StopSlop skill |
+| 图片生成 | 可选 | Agnes / SenseNova API Key |
+| 多平台同步 | 可选 | Wechatsync CLI + Chrome 扩展 |
+| Reddit 选题 | 可选 | rdt-cli + Chrome 登录 |
 
 > 💡 选题时的信源连通性由 AI 自动探测并缓存到 `config/connectivity.json`，无需手动配置。
 
+---
+
 ## 1. 微信公众号 API
 
-用于：自动创建草稿、发布文章、查询数据统计。
+用于自动创建草稿、发布文章、查询数据统计。
 
-> ⚠️ 注意：发布 API 需要公众号完成**个人认证**才能使用。未认证的公众号只能创建草稿，发布需手动操作。
+> ⚠️ 发布需公众号完成**个人认证**，否则报 `48001 api unauthorized`。未认证时只能创建草稿。
 
-### 获取方式
+**获取：** 微信公众平台 → 我的业务与服务 → 公众号 → 开发密钥
 
-1. 登录 [微信公众平台](https://developers.weixin.qq.com/console/index?tab1=business&tab2=dev)
-2. 我的业务与服务 → 公众号
-3. 开发密钥，获取 **开发者ID(AppID)** 和 **开发者密码(AppSecret)**
-
-### 填入配置
-
-配置文件在第 2 步已确定保存位置，直接编辑对应路径的 `config/wxmp.json`：
+**填入 `config/wxmp.json`：**
 ```json
-{
-  "appid": "你的AppID",
-  "secret": "你的AppSecret"
-}
+{ "appid": "你的AppID", "secret": "你的AppSecret" }
 ```
+其他可选字段（`author`、`default_comment`、`default_fans_only_comment`）在第 3 步按需配置。
 
-### 验证
+**验证：** `bash scripts/wx-auth.sh` → 输出 `✅ access_token 获取成功`
 
-```bash
-bash scripts/wx-auth.sh
-```
+**常见问题：**
+- `invalid appid` / `invalid secret` — 检查有无多余空格
+- `ip not in whitelist` — 在公众号后台配 IP 白名单
+- 没 API 也能用 — 写文打磨排版都正常，发布时手动去后台贴 HTML
 
-输出 `✅ access_token 获取成功` 即配置正确。
+---
 
-### 常见问题
+## 2. 写作质量工具（可选）
 
-- `invalid appid` — AppID 填错了，检查是否有多余空格
-- `invalid secret` — AppSecret 填错了
-- `ip not in whitelist` — 需要在公众号后台配置 IP 白名单
+| 工具 | 作用 | 安装 | 验证 | 降级 |
+|------|------|------|------|------|
+| Humanizer | 消除 30 种 AI 写作模式，支持声音校准 | `npx skills add blader/humanizer` | 检查 skill 目录下有 `humanizer` 文件夹 | 用内置 4 轮去 AI 味检查 |
+| StopSlop | 8 条写作原则 + 12 项快速检查 | `npx skills add hardikpandya/stop-slop` | 检查 skill 目录下有 `stop-slop` 文件夹 | 用内置体检报告 |
 
-### 没有 API 也能用
+> 执行顺序：Humanizer（去痕迹）→ StopSlop（打磨质量），配合使用效果最好。
 
-不配置 API 时，写文章、打磨、排版都正常工作。只有发布环节需要手动操作：去公众号后台粘贴 HTML 内容。
+**关于安装位置：** 询问用户后决定：
+- 当前项目：`npx skills add <repo> -y`
+- 全局：`npx skills add <repo> -g -y`（或用 `--all` 装到所有 Agent）
 
-## 2. Humanizer（去 AI 痕迹）
+> 💡 `npx skills add` 需从 GitHub 下载，国内可能访问不了。卡住时配代理重试。
 
-用于：消除 AI 写作的 30 种已知模式（基于维基百科 AI 写作特征检测）。支持声音校准，能匹配用户的个人写作风格。不安装时使用内置的简化版去 AI 味规则。
+---
 
-### 安装方式
+## 3. 图片生成（可选）
 
-```bash
-npx skills add blader/humanizer -y          # 当前项目
-npx skills add blader/humanizer -g -y       # 全局（需指定 Agent 或用 --all）
-```
+| 方案 | 特点 | 获取 | 验证 |
+|------|------|------|------|
+| Agnes AI | 通用图片 | [agnes-ai.com](https://agnes-ai.com/) 注册获取 API Key | `bash scripts/wx-generate-image.sh --prompt "一只猫" --size 512x512` |
+| SenseNova | 信息图，Agnes 备选 | [sensenova.cn](https://sensenova.cn/) 注册获取 API Key | `bash scripts/wx-generate-image-sensenova.sh --prompt "一张简单的测试图"` |
 
-> 具体命令由第 6 步用户选择的安装位置决定，不要直接复制上面的命令。
+配置任一即可，优先 Agnes。在 `config/wxmp.json` 中添加对应 `agnes_api_key` / `sensenova_api_key`。
 
-### 验证
+两个都没配时：配图阶段需要用户自己提供图片，或用占位符标注位置后续补充。
 
-安装后检查 skill 目录下存在 `humanizer` 文件夹即可。
+---
 
-### 没有 Humanizer 也能用
+## 4. Wechatsync（多平台同步，可选）
 
-不安装时，打磨阶段使用内置的 4 轮去 AI 味检查（特征词 → 结构 → 风格 → 人味）。效果够用，Humanizer 是锦上添花。
+把文章同步到知乎、掘金、CSDN 等 24 平台草稿箱。
 
-## 3. StopSlop（写作质量打磨）
+**配置步骤：**
+1. 安装 CLI：`npm install -g @wechatsync/cli`
+2. Chrome 安装[文章同步助手扩展](https://chrome.google.com/webstore/detail/hchobocdmclopcbnibdnoafilagadion)
+3. 在浏览器里登录目标平台
+4. 在扩展设置中启用「MCP 连接」，记下 Token
 
-用于：用 8 条写作原则 + 12 项快速检查打磨文章质量，配合 Humanizer 效果更好。不安装时使用内置规则。
+**配置同步平台：** 首次同步时告诉 AI 目标平台，自动写入 `config/wxmp.json` 的 `wechatsync_platforms`。后续说"加一个 XXX 平台"即可更新。
 
-### 安装方式
+**验证：** `export WECHATSYNC_TOKEN="你的token" && wechatsync platforms --auth`
 
-```bash
-npx skills add hardikpandya/stop-slop -y    # 当前项目
-npx skills add hardikpandya/stop-slop -g -y # 全局（需指定 Agent 或用 --all）
-```
+**常见问题：**
+- CLI 连不上扩展 → 确认扩展已装且「MCP 连接」已开启
+- 平台未登录 → 在浏览器里手动登录
+- Token 不一致 → CLI 的 Token 和扩展里的要一致
 
-> 具体命令由第 6 步用户选择的安装位置决定，不要直接复制上面的命令。
+没配时：文章只发公众号，同步需手动复制粘贴。
 
-### 验证
+---
 
-安装后检查 skill 目录下存在 `stop-slop` 文件夹即可。
+## 5. Reddit 信源（选题扩展，可选）
 
-### 没有 StopSlop 也能用
+AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 
-不安装时，打磨阶段使用内置的文章体检报告（5 维度评分）。效果够用，StopSlop 是锦上添花。
+1. AI 安装 rdt-cli：`uv tool install rdt-cli || pipx install rdt-cli`
+2. **用户操作：** 在 Chrome 登录 [Reddit](https://www.reddit.com)
+3. AI 验证：`rdt login`（自动读取 Chrome 登录状态）
+4. AI 写入配置 `topic_sources.custom`，默认加入 `r/technology` 和 `r/worldnews`
 
-## 4. Agnes AI（图片生成）
+**验证：** `rdt sub technology -n 1 --compact` → 输出一条帖子即正确
 
-用于：根据文字描述自动生成配图。
-
-### 获取方式
-
-1. 访问 [Agnes AI](https://agnes-ai.com/)
-2. 注册账号，获取 API Key
-
-### 填入配置
-
-编辑 `config/wxmp.json`，添加 `agnes_api_key`：
-```json
-{
-  "appid": "...",
-  "secret": "...",
-  "agnes_api_key": "你的Agnes API Key"
-}
-```
-
-### 验证
-
-```bash
-bash scripts/wx-generate-image.sh --prompt "一只猫" --size 512x512
-```
-
-输出图片路径即配置正确。
-
-### 没有 Agnes 也能用
-
-不配置时，配图环节需要用户自己提供图片，或手动在文章中标注图片位置后续补充。
-
-## 5. SenseNova（图片生成备选方案）
-
-用于：信息图 (Infographics) 生成，基于 SenseNova U1 Fast 模型。Agnes 不稳定时的备选方案。
-
-### 获取方式
-
-1. 访问 [SenseNova](https://sensenova.cn/)
-2. 注册账号，获取 API Key
-
-### 填入配置
-
-编辑 `config/wxmp.json`，添加 `sensenova_api_key`：
-```json
-{
-  "appid": "...",
-  "secret": "...",
-  "sensenova_api_key": "你的SenseNova API Key"
-}
-```
-
-### 验证
-
-```bash
-bash scripts/wx-generate-image-sensenova.sh --prompt "一张简单的测试图"
-```
-
-输出图片路径即配置正确。
-
-### 与 Agnes 的关系
-
-两者都是可选的图片生成方案，配置任一即可。优先使用 Agnes，Agnes 失败时自动切换到 SenseNova。两者都未配置时，配图需要用户手动提供。
-
-## 6. Wechatsync（多平台同步）
-
-用于：把公众号文章同步到知乎、掘金、CSDN 等 24 平台的草稿箱。
-
-### 获取方式
-
-**第一步：安装 CLI**
-```bash
-npm install -g @wechatsync/cli
-```
-
-**第二步：安装 Chrome 扩展**
-
-在 Chrome 网上应用店搜索「文章同步助手」，或访问：
-https://chrome.google.com/webstore/detail/hchobocdmclopcbnibdnoafilagadion
-
-**第三步：登录目标平台**
-
-在浏览器里正常登录你要同步的平台（知乎、掘金、CSDN 等）。Wechatsync 使用浏览器已有的 Cookie，不需要额外授权。
-
-**第四步：获取 Token**
-
-在 Chrome 扩展设置中启用「MCP 连接」，记下 Token。
-
-### 配置同步平台
-
-首次同步时告诉 AI 你想同步到哪些平台，会自动写入 `config/wxmp.json`：
-```json
-{
-  "wechatsync_platforms": ["zhihu", "juejin", "csdn"]
-}
-```
-
-后续说"加一个 XXX 平台"即可更新。
-
-### 验证
-
-```bash
-export WECHATSYNC_TOKEN="你的token"
-wechatsync platforms --auth
-```
-
-显示各平台登录状态即配置正确。
-
-### 常见问题
-
-- CLI 连不上扩展 → 确认 Chrome 扩展已安装且「MCP 连接」已开启
-- 平台显示未登录 → 在浏览器里手动登录该平台
-- Token 不一致 → CLI 的 `WECHATSYNC_TOKEN` 要和扩展里设置的一致
-
-### 没有 Wechatsync 也能用
-
-不配置时，文章只发布到公众号。想发到其他平台需要手动复制粘贴。
-
-## 7. Reddit 信源（选题扩展）
-
-用于：从 Reddit 获取原始话题线索，信息差大、时效性强。
-
-### 配置流程
-
-AI 负责安装和配置，用户只需要在浏览器里登录 Reddit。
-
-**第一步：AI 安装 rdt-cli**
-
-安装包名为 `rdt-cli`，安装后的可执行命令为 `rdt`。
-
-```bash
-# 优先用 uv，没有 uv 则用 pipx
-uv tool install rdt-cli || pipx install rdt-cli
-```
-
-**第二步：用户登录 Reddit（需用户操作）**
-
-请用户在 Chrome 浏览器里登录 Reddit（https://www.reddit.com）。登录完成后告知 AI。
-
-**第三步：AI 执行登录验证**
-
-```bash
-rdt login
-```
-
-会自动读取 Chrome 的 Reddit 登录状态。输出成功即可。
-
-### 验证
-
-```bash
-rdt sub technology -n 1 --compact
-```
-
-能输出一条帖子内容即配置正确。
-
-**第四步：AI 写入配置**
-
-将 Reddit 添加到 `config/wxmp.json` 的 `topic_sources` 中：
-
-```json
-{
-  "topic_sources": {
-    "tech": ["GitHub Trending", "Hacker News", "Product Hunt"],
-    "finance": ["TradingView", "CNBC", "Financial Times"],
-    "custom": ["Reddit r/technology", "Reddit r/worldnews"]
-  }
-}
-```
-
-默认添加 `r/technology` 和 `r/worldnews`，用户可以要求调整 subreddit。
-
-### 没有 Reddit 也能用
-
-不配置时，选题只用默认信源（GitHub Trending、Hacker News 等）。Reddit 是补充，不影响核心功能。
+没配时：选题只用默认信源（GitHub Trending、Hacker News 等），不影响核心功能。
 
 ## 快速检查清单
 

@@ -102,7 +102,7 @@ allowed-tools:
 **半自动：** 展示大纲等用户确认
 **全自动：** 生成大纲后直接进入调研
 
-> 大纲格式见 `references/wxmp-writing.md`
+> 大纲格式见 `references/wxmp-outline.md`
 
 ### 3. 调研
 
@@ -133,6 +133,8 @@ allowed-tools:
 2. 查结构：打破刻板结构、排比堆砌、段落雷同
 3. 查风格：加情绪起伏、换口语称呼、补具体案例
 4. 加人味：补个人经历、明确立场、加入口语感和幽默感
+
+> 详细打磨流程见 `references/wxmp-polish.md`
 
 **体检维度：** 开头吸引力、段落可读性、结构清晰度、金句密度、结尾引导力
 
@@ -168,7 +170,7 @@ bash scripts/wx-upload-image.sh /path/to/image.jpg          # 文章配图（默
 bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图（thumb 类型）
 ```
 
-> 详细指引见 `references/wxmp-writing.md` 的配图章节
+> 详细指引见 `references/wxmp-images.md`
 
 ### 7. 排版
 
@@ -189,7 +191,7 @@ bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图（thumb
 
 公众号 HTML 的关键约束：只能用内联 style，不能用外部 CSS/JS，图片必须是微信 CDN 地址。
 
-> 模板详情见 `templates/README.md`，转换方法见 `references/wxmp-writing.md`
+> 模板详情见 `templates/README.md`，转换方法见 `references/wxmp-html.md`
 
 ### 8. 发布
 
