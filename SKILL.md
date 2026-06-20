@@ -156,18 +156,18 @@ allowed-tools:
 
 **图片来源：** 用户自己提供 / AI 生成（Agnes 或 SenseNova）
 
-**图片内容限制：** 所有配图（含封面图）不能出现真人，动画/插画/卡通人物不受限。AI 生成时 prompt 加 `no real people`
+**图片内容限制：** 所有配图不能出现真人、不能包含任何文字（图像模型生成的中文都是乱码）、不能画图表/流程图。动画/插画/卡通人物不受限。AI 生成时 prompt 末尾加 `no real people, no human faces, no text, no labels, no chart, no diagram`
 
-**AI 生成图片：** 构造 prompt 时按"风格描述 + 图片内容 + 约束"三段组合。优先 Agnes，Agnes 失败时切换 SenseNova：
+**AI 生成图片：** 构造 prompt 时按"风格描述 + 图片内容 + 约束"三段组合。图片中不能有任何文字（中文标注、标签、箭头文字都不要加），图像模型生成的中文全是乱码。优先 Agnes，Agnes 失败时切换 SenseNova：
 ```bash
-# Agnes（通用图片）— prompt = 风格 + 内容 + no real people
+# Agnes（通用图片）— prompt = 风格 + 场景内容 + 约束
 bash scripts/wx-generate-image.sh \
-  --prompt "Clean black ink line drawing on white paper, thick bold strokes, minimal composition with lots of empty space. A branching flowchart where the main path forks into three. no real people, no human faces" \
+  --prompt "Flat illustration on white background. Soft warm orange and cream color palette. Minimal geometric shapes. A small square character sits at a desk with a laptop, reaching toward floating shapes above. no real people, no human faces, no text, no labels, no chart, no diagram" \
   --size 1024x768
 
 # SenseNova（信息图，Agnes 的备选方案）
 bash scripts/wx-generate-image-sensenova.sh \
-  --prompt "Clean black ink line drawing on white paper, thick bold strokes, minimal composition with lots of empty space. A branching flowchart where the main path forks into three. no real people, no human faces" \
+  --prompt "Flat illustration on white background. Soft warm orange and cream color palette. Minimal geometric shapes. A small square character sits at a desk with a laptop, reaching toward floating shapes above. no real people, no human faces, no text, no labels, no chart, no diagram" \
   --size 2752x1536
 ```
 

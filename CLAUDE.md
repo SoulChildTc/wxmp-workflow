@@ -21,7 +21,8 @@ This is **not** a traditional codebase with build/test commands. It's a skill de
 
 **scripts/** are shell scripts (curl + jq) for API interaction. All read config from `config/wxmp.json`. Key scripts:
 - `wx-auth.sh` — token management with 2-hour cache in `/tmp/wxmp-token.json`
-- `wx-upload-image.sh` — upload images to WeChat material system
+- `wx-upload-image.sh` — upload images to WeChat material system, returns media_id
+- `wx-delete-image.sh` — delete uploaded image from WeChat material system
 - `wx-draft.sh` — create or update draft articles (use `--media-id` to update existing draft)
 - `wx-preview.sh` — send draft preview to a WeChat user (requires mass message permission)
 - `wx-publish.sh` — publish with async status polling
