@@ -148,7 +148,9 @@ allowed-tools:
 
 在合适的位置添加图片，增强文章表现力。
 
-**前置步骤：先为这篇文章生成专属风格。** AI 读完全文后，基于文章类型和情感基调创造一套独一无二的视觉风格。一篇文章所有配图用同一套风格，保持视觉连贯。详见 `references/wxmp-style-generator.md`。
+**前置步骤：先为这篇文章生成专属风格。** AI 读完全文后，基于文章类型和情感基调创造一套独一无二的视觉风格。一篇文章所有配图用同一套风格，保持视觉连贯。
+
+> 风格生成流程见 `references/wxmp-style-generator.md`
 
 **适合加图的位置：** 开头配图（吸引注意力）、数据图表（可视化数据）、步骤截图（教程类）、结尾引导图（引导关注/转发）
 
@@ -156,13 +158,17 @@ allowed-tools:
 
 **图片内容限制：** 所有配图（含封面图）不能出现真人，动画/插画/卡通人物不受限。AI 生成时 prompt 加 `no real people`
 
-**AI 生成图片：** 优先 Agnes，Agnes 失败时切换 SenseNova：
+**AI 生成图片：** 构造 prompt 时按"风格描述 + 图片内容 + 约束"三段组合。优先 Agnes，Agnes 失败时切换 SenseNova：
 ```bash
-# Agnes（通用图片）
-bash scripts/wx-generate-image.sh --prompt "图片描述" --size 1024x768
+# Agnes（通用图片）— prompt = 风格 + 内容 + no real people
+bash scripts/wx-generate-image.sh \
+  --prompt "Clean black ink line drawing on white paper, thick bold strokes, minimal composition with lots of empty space. A branching flowchart where the main path forks into three. no real people, no human faces" \
+  --size 1024x768
 
 # SenseNova（信息图，Agnes 的备选方案）
-bash scripts/wx-generate-image-sensenova.sh --prompt "图片描述" --size 2752x1536
+bash scripts/wx-generate-image-sensenova.sh \
+  --prompt "Clean black ink line drawing on white paper, thick bold strokes, minimal composition with lots of empty space. A branching flowchart where the main path forks into three. no real people, no human faces" \
+  --size 2752x1536
 ```
 
 **图片必须先上传到微信素材库才能在文章中使用：**
