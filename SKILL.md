@@ -148,6 +148,8 @@ allowed-tools:
 
 在合适的位置添加图片，增强文章表现力。
 
+**前置步骤：先为这篇文章生成专属风格。** AI 读完全文后，基于文章类型和情感基调创造一套独一无二的视觉风格。一篇文章所有配图用同一套风格，保持视觉连贯。详见 `references/wxmp-style-generator.md`。
+
 **适合加图的位置：** 开头配图（吸引注意力）、数据图表（可视化数据）、步骤截图（教程类）、结尾引导图（引导关注/转发）
 
 **图片来源：** 用户自己提供 / AI 生成（Agnes 或 SenseNova）
@@ -168,6 +170,9 @@ bash scripts/wx-generate-image-sensenova.sh --prompt "图片描述" --size 2752x
 bash scripts/wx-upload-image.sh /path/to/image.jpg          # 文章配图（默认 image 类型）
 bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图（thumb 类型）
 ```
+
+**半自动：** 生成风格后展示给用户确认 → 用户认可后生成配图
+**全自动：** 直接生成风格和配图，不确认
 
 > 详细指引见 `references/wxmp-images.md`
 
