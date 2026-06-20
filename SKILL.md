@@ -251,15 +251,16 @@ bash scripts/wx-article-stats.sh --recent 7  # 最近 7 天单篇详情
 
 ### 9. 复盘
 
-发布后用户回来说"帮我查数据"时，通过 API 拉数据做分析。发布时不记录任何文件。
+用户回来说"帮我查数据"时启动。**先读 `config/wxmp.json` 的 `verified` 字段。**
 
-**流程：**
-1. 跑 `wx-articles.sh` 拉已发布文章列表，展示给用户
+- **`verified: false`（无认证）：** 告知用户"未认证账号无法通过 API 查询数据，去公众号后台的数据统计页面查看。"
+- **`verified: true`（已认证）：** 正常执行复盘流程：
+
+1. 跑 `wx-articles.sh` 拉已发布文章列表
 2. 用户选择要复盘的文章
-3. 检查发布时间是否已过 1 天（数据有 ~1 天延迟）
-   - 还没到 → "数据还没出来，明天再来看"
-   - 已过 1 天 → 跑 `wx-article-stats.sh` 查数据
-4. 输出 HTML 格式复盘报告：数据卡片 + 分析 + 建议
+3. 检查发布时间是否已过 1 天
+4. 跑 `wx-article-stats.sh` 查数据
+5. 输出 HTML 复盘报告
 
 > 详细流程见 `references/wxmp-publishing.md` 的复盘章节
 
