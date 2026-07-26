@@ -113,6 +113,8 @@ allowed-tools:
 
 ### 1. 选题
 
+**输入：** 时间范围（当日/本周/本月）| **输出：** 3-5 个选题候选（含来源路线和推荐理由）
+
 三种发现模式综合扫描，每种都执行，综合推荐 3-5 个选题：
 
 - **热点速报**（默认）：当日新闻 + 热搜验证，找有流量基础的话题
@@ -130,6 +132,8 @@ allowed-tools:
 
 ### 2. 大纲
 
+**输入：** 已确认的选题 | **输出：** 结构化大纲（章节标题 + 每章要点）
+
 根据选题生成结构化大纲，确定文章要讲什么、分几部分。大纲确认后再调研和写稿，避免返工。
 
 **半自动：** 展示大纲等用户确认
@@ -138,6 +142,8 @@ allowed-tools:
 > 大纲格式见 `references/wxmp-outline.md`
 
 ### 3. 调研
+
+**输入：** 大纲 + 各章节要点 | **输出：** 按章节组织的素材包（Markdown 列表）
 
 拿着大纲，按每个章节搜集写作素材。不要凭空编造，用真实数据和案例支撑文章。
 
@@ -170,6 +176,8 @@ allowed-tools:
 
 ### 4. 写初稿
 
+**输入：** 大纲 + 素材包 | **输出：** 1500-3000 字 Markdown 全文
+
 按大纲撰写 Markdown 全文。口语化、适合手机阅读、1500-3000 字。遵循中文文案排版指北（`references/chinese-copywriting-guidelines.md`）的盘古之白、全角标点规范，以及排版设计规范（`references/wxmp-typography.md`）的字号、间距、视觉节奏、开头策略。英文术语按 `references/wxmp-writing.md` 的英文处理规则判断保留/翻译/音译。涉及数据/事件/他人观点时标注来源，外链用上标脚注引用、文末统一列出（微信不支持正文内可点击外链），截图比链接更好。
 
 **半自动：** 写完让用户审阅
@@ -178,6 +186,8 @@ allowed-tools:
 > 详细写作要求见 `references/wxmp-writing.md`
 
 ### 5. 打磨
+
+**输入：** 初稿 Markdown | **输出：** 去 AI 味后的终稿 + 12 个候选标题 + 3 个摘要版本
 
 写完初稿后，先去 AI 味，再跑体检报告，针对性优化，最后生成标题和摘要。每一步都是必经步骤，MUST NOT 跳过。
 
@@ -199,6 +209,8 @@ allowed-tools:
 > 体检报告用法见 `references/wxmp-tools.md`
 
 ### 6. 配图
+
+**输入：** 文章内容 + 情感基调 | **输出：** 上传到微信的图片 CDN 地址
 
 在合适的位置添加图片，增强文章表现力。
 
@@ -233,6 +245,8 @@ bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图
 
 ### 7. 排版
 
+**输入：** Markdown 终稿 + 用户选择的模板 | **输出：** `output/xxx.html`（公众号兼容 HTML）
+
 将 Markdown 文章转为公众号兼容的 HTML 格式，保存到 `output/`。
 
 **5 个精美模板可选：**
@@ -253,6 +267,8 @@ bash scripts/wx-upload-image.sh /path/to/cover.jpg thumb     # 封面图
 > 模板详情见 `templates/README.md`，转换方法见 `references/wxmp-html.md`
 
 ### 8. 发布
+
+**输入：** HTML 文件 + 封面图 CDN 地址 | **输出：** 草稿箱中的草稿（media_id）
 
 > ⚠️ 个人订阅号通常没有个人认证，预览和发布 API 不可用。但**创建草稿和查询数据不需要认证**。
 
@@ -304,6 +320,8 @@ bash scripts/wx-article-stats.sh --recent 7  # 最近 7 天单篇详情
 > 详细流程见 `references/wxmp-publishing.md`
 
 ### 9. 复盘
+
+**输入：** 无（按需触发）| **输出：** 文章数据复盘报告
 
 用户回来说"帮我查数据"时启动。**先读 `config/wxmp.json` 的 `verified` 字段。**
 
