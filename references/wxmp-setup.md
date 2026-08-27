@@ -286,4 +286,4 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 |------|---------|---------|
 | v1 → v2 | 新增 `sensenova_model`（默认 U1.5 Lite）、`sensenova_prompt_extend`、`config_schema_version` 字段 | 运行配置助手，选择是否启用新模型和提示词润色 |
 
-> 当 AI 检测到 `config_schema_version` 缺失或低于当前版本时，会提示用户更新配置。更新后写入最新版本号，不再重复提示。
+> 当检测到 `config_schema_version` 缺失或低于当前版本时，提示用户更新配置。更新后写入最新版本号，不再重复提示。
