@@ -38,11 +38,11 @@
 | Agnes AI | ✅ 已配置 / ❌ 未配置 | 图片生成，可选 |
 | SenseNova | ✅ 已配置 / ❌ 未配置 | 图片生成（Agnes 备选），可选 |
 | Reddit 信源 | ✅ 已配置 / ❌ 未配置 | 选题扩展，可选 |
-| 配置版本 | v2 / ⚠️ 过旧 | 低于 v2 时建议更新配置 |
+| 配置版本 | ✅ 当前 / ⚠️ 过旧 | 低于当前版本时建议更新配置 |
 ```
 
 检测 SenseNova 配置状态：检查 `sensenova_api_key` 是否存在。
-检测配置版本：读取 `config_schema_version` 字段，与当前版本 v2 比对。不存在或低于 v2 则标记为过旧。
+检测配置版本：读取 `config_schema_version` 字段，与「配置版本历史」中的当前版本比对。不存在或低于当前版本则标记为过旧。
 
 检测 Humanizer/StopSlop 安装状态：检查 skill 安装目录下是否存在 `humanizer` / `stop-slop` 文件夹。
 检测 Reddit 配置状态：执行 `which rdt` 检查 rdt-cli 是否安装，再检查 `topic_sources` 中是否包含 Reddit。
@@ -143,7 +143,7 @@
 
 配置完成后，再次运行检查，展示最终状态。
 
-确保 `config_schema_version` 已写入配置文件且值为 `2`。如果用户是从旧版本升级，在配置完成后写入此字段，标记配置已更新到最新版本。
+确保 `config_schema_version` 已写入配置文件且为最新版本号。如果用户是从旧版本升级，在配置完成后写入此字段，标记配置已更新到最新版本。
 
 ## 配置总览
 

@@ -71,7 +71,7 @@ The config file contains secrets and is gitignored. Key fields:
 - `sensenova_api_key` — SenseNova API key for image generation, Agnes fallback (optional)
 - `sensenova_model` — SenseNova model ID: `sensenova-u1.5-lite` (default) or `sensenova-u1-fast` (optional)
 - `sensenova_prompt_extend` — enable SenseNova auto prompt refinement, `false` by default (optional)
-- `config_schema_version` — config schema version for update detection, current is 2 (optional)
+- `config_schema_version` — config schema version for update detection; current version defined in `references/wxmp-setup.md` (optional)
 - `proxy` — proxy config object with `http` and `https` fields (e.g. `{"http":"http://127.0.0.1:7890","https":"http://127.0.0.1:7890"}`); empty strings mean no proxy (optional)
 - `topic_sources` — user-configured original sources for deep topic discovery (optional, has defaults)
 
