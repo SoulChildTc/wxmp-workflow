@@ -36,8 +36,13 @@
 | Humanizer | ✅ 已安装 / ❌ 未安装 | 去 AI 痕迹，可选 |
 | StopSlop | ✅ 已安装 / ❌ 未安装 | 写作质量打磨，可选 |
 | Agnes AI | ✅ 已配置 / ❌ 未配置 | 图片生成，可选 |
+| SenseNova | ✅ 已配置 / ❌ 未配置 | 图片生成（Agnes 备选），可选 |
 | Reddit 信源 | ✅ 已配置 / ❌ 未配置 | 选题扩展，可选 |
+| 配置版本 | v2 / ⚠️ 过旧 | 低于 v2 时建议更新配置 |
 ```
+
+检测 SenseNova 配置状态：检查 `sensenova_api_key` 是否存在。
+检测配置版本：读取 `config_schema_version` 字段，与当前版本 v2 比对。不存在或低于 v2 则标记为过旧。
 
 检测 Humanizer/StopSlop 安装状态：检查 skill 安装目录下是否存在 `humanizer` / `stop-slop` 文件夹。
 检测 Reddit 配置状态：执行 `which rdt` 检查 rdt-cli 是否安装，再检查 `topic_sources` 中是否包含 Reddit。
@@ -117,7 +122,7 @@
 - Humanizer："要安装 Humanizer 来消除 AI 写作痕迹吗？基于维基百科 AI 写作特征检测，支持声音校准。"
 - StopSlop："要安装 StopSlop 来提升文章质量吗？它是一套专业的写作打磨规则，配合 Humanizer 效果更好。"
 - Agnes AI："要配置 AI 图片生成吗？可以一句话生成配图。"
-- SenseNova："Agnes 不稳定的话，要同时配置 SenseNova 作为备选图片生成方案吗？擅长信息图。"
+- SenseNova："要同时配置 SenseNova 作为备选图片生成方案吗？默认使用 U1.5 Lite 模型（新一代图片生成），也可切换 U1 Fast（擅长信息图）。"
 - Reddit："要接入 Reddit 作为选题信源吗？信息差大、时效性强。需要在浏览器登录 Reddit。"
 
 用户说"要"→ 引导配置；说"不要"→ 跳过，不打扰；说"已经装过了"→ 跳过安装，验证可用即可。
@@ -137,6 +142,8 @@
 ### 第 7 步：确认
 
 配置完成后，再次运行检查，展示最终状态。
+
+确保 `config_schema_version` 已写入配置文件且值为 `2`。如果用户是从旧版本升级，在配置完成后写入此字段，标记配置已更新到最新版本。
 
 ## 配置总览
 
@@ -230,6 +237,7 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 
 ```json
 {
+  "config_schema_version": 2,
   "appid": "wx1234567890abcdef",
   "secret": "your_app_secret_here",
   "verified": false,
@@ -237,6 +245,9 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
   "default_comment": 1,
   "default_fans_only_comment": 0,
   "agnes_api_key": "your_agnes_api_key_here",
+  "sensenova_api_key": "your_sensenova_api_key_here",
+  "sensenova_model": "sensenova-u1.5-lite",
+  "sensenova_prompt_extend": false,
   "proxy": {
     "http": "",
     "https": ""
@@ -259,4 +270,20 @@ AI 负责安装和配置，用户只需在浏览器登录 Reddit。
 | `default_fans_only_comment` | 是否仅粉丝可评论（1=是，0=否） | 0 |
 | `proxy` | 代理配置，含 `http` 和 `https` 两个字段，空则不走代理 | `{"http":"","https":""}` |
 | `agnes_api_key` | Agnes AI 图片生成 API Key | 可选 |
+| `sensenova_api_key` | SenseNova 图片生成 API Key（Agnes 备选） | 可选 |
+| `sensenova_model` | SenseNova 模型 ID：`sensenova-u1.5-lite`（默认，新一代图片生成）或 `sensenova-u1-fast`（信息图） | `sensenova-u1.5-lite` |
+| `sensenova_prompt_extend` | 是否开启 SenseNova 自动提示词润色（`true`=开启，`false`=保持原样） | `false` |
+| `config_schema_version` | 配置文件版本号，用于检测是否需要更新配置 | `2` |
 | `topic_sources` | 选题信源，对象结构：`tech`（科技）、`finance`（财经）、`custom`（自定义），每个字段是字符串数组。`custom` 用于 Reddit 等扩展信源 | 见示例 |
+
+---
+
+## 配置版本历史
+
+当前版本：**v2**
+
+| 版本 | 变更内容 | 需要操作 |
+|------|---------|---------|
+| v1 → v2 | 新增 `sensenova_model`（默认 U1.5 Lite）、`sensenova_prompt_extend`、`config_schema_version` 字段 | 运行配置助手，选择是否启用新模型和提示词润色 |
+
+> 当 AI 检测到 `config_schema_version` 缺失或低于当前版本时，会提示用户更新配置。更新后写入最新版本号，不再重复提示。

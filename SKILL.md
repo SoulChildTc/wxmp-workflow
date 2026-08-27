@@ -112,6 +112,16 @@ allowed-tools:
 | 10 | 直接用外部图片 URL | 微信会拦截非 CDN 图片，导致文章显示不全 | 先上传到微信素材系统，用 CDN 地址 |
 | 11 | 打磨阶段自己改自己评 | AI 倾向于给自己的文章打高分，"自评自改"无法发现真实 AI 味 | 4 轮扫描和量化评分 MUST 派发独立子 agent 执行，不能和写稿 agent 是同一个 |
 
+## 预检：配置版本
+
+开始工作流前，读取 `config/wxmp.json` 中的 `config_schema_version` 字段。当前版本为 **v2**。如果字段不存在或低于 v2：
+
+1. 提示用户：「检测到配置需要更新（v1 → v2），新增了 SenseNova U1.5 Lite 模型支持等配置项。建议输入"帮我配置"更新。」
+2. 用户选择更新 → 引导到配置助手（`references/wxmp-setup.md`）
+3. 用户选择跳过 → 继续工作流，新功能使用默认值，不再重复提示
+
+> 版本变更详情见 `references/wxmp-setup.md` 的「配置版本历史」
+
 ## 完整流程
 
 ### 1. 选题
@@ -262,7 +272,7 @@ bash scripts/wx-generate-image.sh \
   --size 1024x768
 bash scripts/wx-generate-image-sensenova.sh \
   --prompt "Warm orange and golden yellow tones, soft light from above. A ladder extends from bottom center up into soft clouds. no real people, no human faces, no text, no labels, no chart, no diagram" \
-  --size 2752x1536
+  --size 2720x1536
 ```
 
 **上传：**

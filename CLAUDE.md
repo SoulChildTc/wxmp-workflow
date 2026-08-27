@@ -30,7 +30,7 @@ This is **not** a traditional codebase with build/test commands. It's a skill de
 - `wx-articles.sh` — list published articles
 - `wx-article-stats.sh` — per-article detailed stats (7-day max range)
 - `wx-generate-image.sh` — Agnes AI image generation (文生图)
-- `wx-generate-image-sensenova.sh` — SenseNova U1 Fast image generation (信息图, Agnes fallback)
+- `wx-generate-image-sensenova.sh` — SenseNova U1.5 Lite / U1 Fast image generation (文生图, Agnes fallback, supports `--model` switch)
 
 **templates/** contains 5 beautiful HTML templates with inline styles:
 - `minimal-white.html` — clean, lots of whitespace (tutorials, guides)
@@ -68,6 +68,10 @@ The config file contains secrets and is gitignored. Key fields:
 - `default_comment` — enable comments (1) or disable (0), default 1
 - `default_fans_only_comment` — fans-only commenting (1) or open (0), default 0
 - `agnes_api_key` — Agnes AI API key for image generation (optional)
+- `sensenova_api_key` — SenseNova API key for image generation, Agnes fallback (optional)
+- `sensenova_model` — SenseNova model ID: `sensenova-u1.5-lite` (default) or `sensenova-u1-fast` (optional)
+- `sensenova_prompt_extend` — enable SenseNova auto prompt refinement, `false` by default (optional)
+- `config_schema_version` — config schema version for update detection, current is 2 (optional)
 - `proxy` — proxy config object with `http` and `https` fields (e.g. `{"http":"http://127.0.0.1:7890","https":"http://127.0.0.1:7890"}`); empty strings mean no proxy (optional)
 - `topic_sources` — user-configured original sources for deep topic discovery (optional, has defaults)
 
